@@ -145,11 +145,13 @@ def sendUUIDNameRequest(sock, port, host, currentsequence,aUUID):
     return              
  
 def sendRegionHandshakeReply(sock, port, host, currentsequence,agentUUID,sessionUUID):
+
+    flags = 0x07 # SENDALLOBJECTS | SENDALLCHCEABLEOBJECTS | SUPPORTSSELFAPPEARANCE
     packed_data = b''
  
     low_ID = "ffff00%2x" % 149
     data_header = pack('>BLB', 0x00,currentsequence,0x00)
-    packed_data += uuid.UUID(agentUUID).bytes+uuid.UUID(sessionUUID).bytes+ pack(">L",0x00)
+    packed_data += uuid.UUID(agentUUID).bytes+uuid.UUID(sessionUUID).bytes+ pack(">L",flags)
     packed_data = data_header + pack(">L",int(low_ID,16))+packed_data
     sock.sendto(packed_data, (host, port)) 
     print("Sending RegionHandshakeReply to server", ByteToHex(packed_data))
