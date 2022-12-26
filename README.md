@@ -15,6 +15,8 @@ At one time, there was an organization called the "Open Metaverse Foundation", w
 some of this material. Their web site is long gone, but
 [remnants of their code repository can be found in the Internet Archive.](http://openmetaverse.org/svn/omf/libopenmetaverse/trunk/)
 
+A [later version of the repository exists on Github.](https://github.com/openmetaversefoundation/)
+
 # Status
 
 The original version was in Python 2. It's been updated here to work with Python 3.10.
