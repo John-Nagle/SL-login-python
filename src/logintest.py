@@ -289,7 +289,7 @@ def establishpresence(host, port, circuit_code):
             #print("ID =", ByteToHex(ID))
             if data[0]&0x80:                 
                 ID = zero_decode_ID(data[6:12])
-                print("Zero decode msg number: ",data[6:12], " -> ", ID) ## ***TEMP***
+                # print("Zero decode msg number: ",data[6:12], " -> ", ID)
  
             if data[0]&0x40: 
                 scheduleacknowledgemessage(data); 
