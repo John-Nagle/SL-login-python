@@ -358,14 +358,24 @@ def establishpresence(host, port, circuit_code):
     return
  
  
- 
-MAC="60:a4:4c:cf:3f:5a"
-FIRSTNAME="animatsalt"
-LASTNAME="Resident"
-mypacketdictionary = makepacketdict()
-password = input("Password for %s %s: " % (FIRSTNAME, LASTNAME))
+#   Main program
+#   Login credentials 
+MAC="60:a4:4c:cf:3f:5a" # dummy
+
+mypacketdictionary = makepacketdict()   # message formats, from the message template file.
+#   Prompt for user name and password
+print("Second Life login, main grid.")
+loginname = input("User name: ")
+firstlast = re.split(r'[\W\.]+', loginname.strip()) # split on whitespace or periods.
+if len(firstlast) == 1 :
+    firstlast.append("Resident")
+elif len(firstlast) != 2 :
+    print("User name must be FIRSTNAME LASTNAME or FIRSTNAME")
+    exit()
+    
+password = input("Password for %s %s: " % (firstlast[0], firstlast[1]))
 print("Starting login.")
-result = login(FIRSTNAME, LASTNAME, password, MAC)
+result = login(firstlast[0], firstlast[1], password, MAC)
  
 myhost = result["sim_ip"]
 myport = result["sim_port"]
