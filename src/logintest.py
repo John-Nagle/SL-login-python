@@ -145,14 +145,14 @@ def sendUUIDNameRequest(sock, port, host, currentsequence,aUUID):
     return              
  
 def sendRegionHandshakeReply(sock, port, host, currentsequence,agentUUID,sessionUUID):
-    packed_data = ""
+    packed_data = b''
  
     low_ID = "ffff00%2x" % 149
     data_header = pack('>BLB', 0x00,currentsequence,0x00)
     packed_data += uuid.UUID(agentUUID).bytes+uuid.UUID(sessionUUID).bytes+ pack(">L",0x00)
     packed_data = data_header + pack(">L",int(low_ID,16))+packed_data
     sock.sendto(packed_data, (host, port)) 
-    #print("RegionHandshakeReply", ByteToHex(packed_data))
+    print("Sending RegionHandshakeReply to server", ByteToHex(packed_data))
     return
  
  
@@ -169,20 +169,25 @@ def sendAgentUpdate(sock, port, host, currentsequence, result):
         flags = 0x10
  
     #print("tempacks is:", ByteToHex(tempacks))
+    
+    far_view_distance = 400.0 # View distance
  
     data_header = pack('>BLB', flags,currentsequence,0x00)
     packed_data_message_ID = pack('>B',0x04)
     packed_data_ID = uuid.UUID(result["agent_id"]).bytes + uuid.UUID(result["session_id"]).bytes
-    packed_data_QuatRots = pack('<ffff', 0.0,0.0,0.0,0.0)+pack('<ffff', 0.0,0.0,0.0,0.0)  
+    packed_data_QuatRots = pack('<ffff', 0.0,0.0,0.0,1.0)+pack('<ffff', 0.0,0.0,0.0,1.0)  
     packed_data_State = pack('<B', 0x00)
-    packed_data_Camera = pack('<fff', 0.0,0.0,0.0)+pack('<fff', 0.0,0.0,0.0)+pack('<fff', 0.0,0.0,0.0)+pack('<fff', 0.0,0.0,0.0)
-    packed_data_Flags = pack('<fLB', 0.0,0x00,0x00)
+    ####packed_data_Camera = pack('<fff', 0.0,0.0,0.0)+pack('<fff', 0.0,0.0,0.0)+pack('<fff', 0.0,0.0,0.0)+pack('<fff', 0.0,0.0,0.0)
+    #   Camera: center, look at vector, left vector, up vector.
+    packed_data_Camera = pack('<fff', 0.0,0.0,0.0)+pack('<fff', 1.0,1.0,0.0)+pack('<fff', 0.0,1.0,0.0)+pack('<fff', 0.0,0.0,1.0)
+    packed_data_Flags = pack('<fLB', far_view_distance,0x00,0x00)
  
     encoded_packed_data = zero_encode(packed_data_message_ID+packed_data_ID+packed_data_QuatRots+packed_data_State+packed_data_Camera+packed_data_Flags)
  
     packed_data = data_header + encoded_packed_data+tempacks
  
-   # print "sending AgentUpdate to server",ByteToHex(packed_data_header+zero_decode(encoded_packed_data)+ tempacks)
+    print("Sending Agent Update to server, seq #", currentsequence)
+    # print("sending AgentUpdate to server",ByteToHex(data_header+zero_decode(encoded_packed_data)+ tempacks))
  
     sock.sendto(packed_data, (host, port))
     return
@@ -262,6 +267,7 @@ def establishpresence(host, port, circuit_code):
             ack_need_list_changed = False
             seqnum += 1
             sendPacketAck(sock, port, host,seqnum)
+            #   Really should send an agent update once a second or so.
             #sendAgentUpdate(sock, port, host, seqnum, result)
             seqnum += 1
         #sendacks()
@@ -281,8 +287,9 @@ def establishpresence(host, port, circuit_code):
             #print(test)
             ID = data[6:12]
             #print("ID =", ByteToHex(ID))
-            if data[0]&0x80: 
+            if data[0]&0x80:                 
                 ID = zero_decode_ID(data[6:12])
+                print("Zero decode msg number: ",data[6:12], " -> ", ID) ## ***TEMP***
  
             if data[0]&0x40: 
                 scheduleacknowledgemessage(data); 
@@ -302,6 +309,7 @@ def establishpresence(host, port, circuit_code):
                         #if ord(data[0])&0x40 and myentry[1] == "Trusted": trusted_and_ackable += 1; print "trusted_and_ackable =", trusted_and_ackable
                         #if ord(data[0])&0x40: ackable += 1; print "number of ackable messages = ", ackable
                     else:
+                        print("Low msg, type bytes: ", ID[2:4]) ## ***TEMP***
                         myentry = mypacketdictionary[("Low",int(ByteToHex(ID[2:4]).replace(' ', ''),16))]
                         if myentry[1] == "Trusted":
                             trusted += 1;

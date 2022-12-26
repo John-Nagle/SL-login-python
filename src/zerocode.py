@@ -64,16 +64,16 @@ def zero_encode(inputbuf):
     return newstring
  
 def zero_decode(inputbuf):
-    newstring =""
+    newstring = b""
     in_zero = False
     for c in inputbuf:
-        if c != '\0':
+        if c != 0:
             if in_zero == True:
-                zero_count = ord(c)
+                zero_count = c
                 zero_count = zero_count -1
                 while zero_count>0:
  
-                    newstring = newstring + '\0'
+                    newstring = newstring + b'\0'
                     zero_count = zero_count -1
                 in_zero = False
             else:
@@ -84,17 +84,17 @@ def zero_decode(inputbuf):
     return newstring
  
 def zero_decode_ID(inputbuf):
-    newstring =b''
+    newstring = b''
     in_zero = False
     #print "in encode, input is", ByteToHex(inputbuf)
     for c in inputbuf:
-        if c != '\0':
+        if c != 0:
             if in_zero == True:
-                zero_count = ord(c)
+                zero_count = c
                 zero_count = zero_count -1
                 while zero_count>0:
  
-                    newstring = newstring + '\0'
+                    newstring = newstring + b'\0'
                     zero_count = zero_count -1
                 in_zero = False
             else:
