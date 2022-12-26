@@ -309,7 +309,6 @@ def establishpresence(host, port, circuit_code):
                         #if ord(data[0])&0x40 and myentry[1] == "Trusted": trusted_and_ackable += 1; print "trusted_and_ackable =", trusted_and_ackable
                         #if ord(data[0])&0x40: ackable += 1; print "number of ackable messages = ", ackable
                     else:
-                        print("Low msg, type bytes: ", ID[2:4]) ## ***TEMP***
                         myentry = mypacketdictionary[("Low",int(ByteToHex(ID[2:4]).replace(' ', ''),16))]
                         if myentry[1] == "Trusted":
                             trusted += 1;
